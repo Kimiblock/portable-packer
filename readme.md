@@ -1,0 +1,2 @@
+# Dependencies
+- desktop-file-utils

@@ -12,7 +12,6 @@ func main() {
 		return
 	}
 	args := os.Args[1:]
-	logger.Println("Got command line arguments:", args)
-
+	cmdlineDispatcher(args, logger)
 
 }
