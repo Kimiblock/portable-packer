@@ -15,5 +15,4 @@ func help (logger *log.Logger) {
 	logger.Println("	--config-ng [path]	-> Specify the TOML configuration source for sandbox")
 	logger.Println("	--desktop-file [path]	-> Specify the desktop file path for sandbox")
 	logger.Println("	--dbus-activation	-> Enables the activation from D-Bus (optional)")
-	logger.Println("	--dbus-arguments	-> Specify an argument to use when being activated, can be used more than once")
 }
