@@ -6,16 +6,41 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 func archPost (logger *log.Logger, act action) {
+	var wg sync.WaitGroup
 	srcdir := os.Getenv("srcdir")
 	pkgdir := os.Getenv("pkgdir")
 	pkgname := os.Getenv("pkgname")
 	if len(srcdir) == 0 || len(pkgdir) == 0 || len(pkgname) == 0 {
 		logger.Fatalln("Please declare srcdir, pkgdir, pkgname as global")
 	}
-
+	pathList := []string{
+		"/usr/share/applications",
+		"/usr/bin",
+		"/etc/xdg/autostart",
+		"/usr/share/dbus-1",
+		"/usr/share/menu",
+		"/usr/share/gnome-shell",
+	}
+	for _, path := range pathList {
+		wg.Go(func() {
+			err := os.RemoveAll(
+				filepath.Join(
+					pkgname,
+					path,
+				),
+			)
+			if err != nil {
+				if os.IsNotExist(err) {
+					return
+				}
+				logger.Fatalln("Could not remove directory:", err)
+			}
+		})
+	}
 	builder := strings.Builder{}
 	builder.WriteString("#!/usr/bin/bash\n")
 	builder.WriteString("export _portableConfig=")
@@ -98,5 +123,4 @@ func archPost (logger *log.Logger, act action) {
 			logger.Fatalln("Could not write configuration:", err)
 		}
 	}
-
 }
