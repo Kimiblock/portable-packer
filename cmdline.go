@@ -12,23 +12,24 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+type action struct {
+	// post or copy
+	act		string
+	copyPkg		string
+	// Only arch
+	distro		string
+	configPath	string
+	modernConfig	bool
+	appID		string
+	desktopFile	string
+	busActivate	bool
+	busArgs		[]string
+}
+
 func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 	logger.Println("Got command line arguments:", cmdline)
 	var skip int
-	type action struct {
-		// post or copy
-		act		string
 
-		// Only arch
-		distro		string
-		configPath	string
-		modernConfig	bool
-		appID		string
-		desktopFile	string
-
-		busActivate	bool
-		busArgs		[]string
-	}
 	var actionData action
 
 	for idx := range cmdline {
@@ -42,12 +43,7 @@ func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 					logger.Fatalln("Could not decode command line arguments: not enough arguments")
 				}
 				skip++
-				switch cmdline[idx + 1] {
-					case "arch":
-						actionData.distro = "arch"
-					default:
-						logger.Fatalln("Unsupported distro:", cmdline[idx + 1])
-				}
+				actionData.distro = cmdline[idx + 1]
 			case "--mode":
 				if len(cmdline) <= idx + 1 {
 					logger.Fatalln("Could not decode command line arguments: not enough arguments")
@@ -55,6 +51,15 @@ func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 				skip++
 				switch cmdline[idx + 1] {
 					case "copy", "post":
+						if cmdline[idx + 1] == "copy" {
+							skip++
+							if len(cmdline) <= idx + 2 {
+								logger.Fatalln(
+									"Could not decode command line arguments: not enough arguments",
+								)
+							}
+							actionData.copyPkg = cmdline[idx + 2]
+						}
 						actionData.act = cmdline[idx + 1]
 					default:
 						logger.Fatalln("Unsupported mode:", cmdline[idx + 1])
@@ -144,5 +149,20 @@ func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 			case "--dbus-activation":
 				actionData.busActivate = true
 		}
+	}
+
+	switch actionData.distro {
+		case "arch", "archlinux", "Arch", "Arch Linux":
+			switch actionData.act {
+				case "copy":
+					archCopy(actionData, logger)
+					archPost(logger, actionData)
+				case "post":
+					archPost(logger, actionData)
+				default:
+					logger.Fatalln("Unsupported act:", actionData.act)
+			}
+		default:
+			logger.Fatalln("Unsupported distro:", actionData.distro)
 	}
 }
