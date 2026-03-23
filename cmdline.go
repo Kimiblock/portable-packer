@@ -43,12 +43,7 @@ func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 					logger.Fatalln("Could not decode command line arguments: not enough arguments")
 				}
 				skip++
-				switch cmdline[idx + 1] {
-					case "arch":
-						actionData.distro = "arch"
-					default:
-						logger.Fatalln("Unsupported distro:", cmdline[idx + 1])
-				}
+				actionData.distro = cmdline[idx + 1]
 			case "--mode":
 				if len(cmdline) <= idx + 1 {
 					logger.Fatalln("Could not decode command line arguments: not enough arguments")
@@ -154,5 +149,20 @@ func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 			case "--dbus-activation":
 				actionData.busActivate = true
 		}
+	}
+
+	switch actionData.distro {
+		case "arch", "archlinux", "Arch", "Arch Linux":
+			switch actionData.act {
+				case "copy":
+					archCopy(actionData, logger)
+					archPost(logger, actionData)
+				case "post":
+					archPost(logger, actionData)
+				default:
+					logger.Fatalln("Unsupported act:", actionData.act)
+			}
+		default:
+			logger.Fatalln("Unsupported distro:", actionData.distro)
 	}
 }
