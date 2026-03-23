@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func archPost (logger *log.Logger, act action) {
@@ -14,6 +15,60 @@ func archPost (logger *log.Logger, act action) {
 	if len(srcdir) == 0 || len(pkgdir) == 0 || len(pkgname) == 0 {
 		logger.Fatalln("Please declare srcdir, pkgdir, pkgname as global")
 	}
+
+	builder := strings.Builder{}
+	builder.WriteString("#!/usr/bin/bash\n")
+	builder.WriteString("export _portableConfig=")
+	builder.WriteString(act.appID)
+	builder.WriteString("\nexec portable -- $@\n")
+	reader := strings.NewReader(builder.String())
+	err := os.MkdirAll(filepath.Join(pkgdir, "/usr/bin"), 0755)
+	if err != nil {
+		logger.Fatalln("Could not create stub file:", err)
+	}
+	file, err := os.OpenFile(
+		filepath.Join(pkgdir, "/usr/bin", pkgname),
+		os.O_CREATE|os.O_WRONLY|os.O_TRUNC,
+		0755,
+	)
+	_, err = io.Copy(file, reader)
+	if err != nil {
+		logger.Fatalln("Could not create stub file:", err)
+	}
+	file.Close()
+
+	if len(act.desktopFile) > 0 {
+		ori, err := os.OpenFile(
+			act.desktopFile,
+			os.O_RDONLY,
+			0700,
+		)
+		if err != nil {
+			logger.Fatalln("Could not install .desktop file:", err)
+		}
+		err = os.MkdirAll(
+			filepath.Join(pkgdir, "usr/share/applications/"),
+			0755,
+		)
+		if err != nil {
+			logger.Fatalln("Could not install .desktop file:", err)
+		}
+		dest, err := os.OpenFile(
+			filepath.Join(pkgdir, "usr/share/applications/", act.appID + ".desktop"),
+			os.O_CREATE|os.O_TRUNC|os.O_WRONLY,
+			0700,
+		)
+		if err != nil {
+			logger.Fatalln("Could not install .desktop file:", err)
+		}
+		_, err = io.Copy(dest, ori)
+		if err != nil {
+			logger.Fatalln("Could not install .desktop file:", err)
+		}
+		ori.Close()
+		dest.Close()
+	}
+
 	if len(act.configPath) > 0 {
 		logger.Println("Installing configuration")
 		config, err := os.OpenFile(act.configPath, os.O_RDONLY, 0700)
