@@ -123,4 +123,7 @@ func archPost (logger *log.Logger, act action) {
 			logger.Fatalln("Could not write configuration:", err)
 		}
 	}
+	if act.busActivate {
+		instDBusService(logger, act, pkgname)
+	}
 }
