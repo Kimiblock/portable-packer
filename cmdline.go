@@ -12,25 +12,24 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+type action struct {
+	// post or copy
+	act		string
+	copyPkg		string
+	// Only arch
+	distro		string
+	configPath	string
+	modernConfig	bool
+	appID		string
+	desktopFile	string
+	busActivate	bool
+	busArgs		[]string
+}
+
 func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 	logger.Println("Got command line arguments:", cmdline)
 	var skip int
-	type action struct {
-		// post or copy
-		act		string
 
-		copyPkg		string
-
-		// Only arch
-		distro		string
-		configPath	string
-		modernConfig	bool
-		appID		string
-		desktopFile	string
-
-		busActivate	bool
-		busArgs		[]string
-	}
 	var actionData action
 
 	for idx := range cmdline {
