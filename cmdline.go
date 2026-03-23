@@ -19,6 +19,8 @@ func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 		// post or copy
 		act		string
 
+		copyPkg		string
+
 		// Only arch
 		distro		string
 		configPath	string
@@ -55,6 +57,15 @@ func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 				skip++
 				switch cmdline[idx + 1] {
 					case "copy", "post":
+						if cmdline[idx + 1] == "copy" {
+							skip++
+							if len(cmdline) <= idx + 2 {
+								logger.Fatalln(
+									"Could not decode command line arguments: not enough arguments",
+								)
+							}
+							actionData.copyPkg = cmdline[idx + 2]
+						}
 						actionData.act = cmdline[idx + 1]
 					default:
 						logger.Fatalln("Unsupported mode:", cmdline[idx + 1])
