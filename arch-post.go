@@ -29,7 +29,7 @@ func archPost (logger *log.Logger, act action) {
 		wg.Go(func() {
 			err := os.RemoveAll(
 				filepath.Join(
-					pkgname,
+					pkgdir,
 					path,
 				),
 			)
@@ -42,6 +42,7 @@ func archPost (logger *log.Logger, act action) {
 		})
 	}
 	wg.Wait()
+	logger.Println("Cleaned holes")
 	builder := strings.Builder{}
 	builder.WriteString("#!/usr/bin/bash\n")
 	builder.WriteString("export _portableConfig=")
