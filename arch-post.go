@@ -41,6 +41,7 @@ func archPost (logger *log.Logger, act action) {
 			}
 		})
 	}
+	wg.Wait()
 	builder := strings.Builder{}
 	builder.WriteString("#!/usr/bin/bash\n")
 	builder.WriteString("export _portableConfig=")
