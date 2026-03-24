@@ -84,4 +84,5 @@ func archCopy(act action, logger *log.Logger) {
 			}
 		})
 	}
+	wg.Wait()
 }
