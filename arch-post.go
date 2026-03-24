@@ -45,7 +45,12 @@ func archPost (logger *log.Logger, act action) {
 	logger.Println("Cleaned holes")
 	builder := strings.Builder{}
 	builder.WriteString("#!/usr/bin/bash\n")
-	builder.WriteString("export _portableConfig=")
+	if act.modernConfig {
+		builder.WriteString("export PORTABLE_CONF=")
+	} else {
+		builder.WriteString("export _portableConfig=")
+	}
+
 	builder.WriteString(act.appID)
 	builder.WriteString("\nexec portable -- $@\n")
 	reader := strings.NewReader(builder.String())
