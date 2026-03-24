@@ -88,7 +88,7 @@ func archPost (logger *log.Logger, act action) {
 		dest, err := os.OpenFile(
 			filepath.Join(pkgdir, "usr/share/applications/", act.appID + ".desktop"),
 			os.O_CREATE|os.O_TRUNC|os.O_WRONLY,
-			0700,
+			0644,
 		)
 		if err != nil {
 			logger.Fatalln("Could not install .desktop file:", err)

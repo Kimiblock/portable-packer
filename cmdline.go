@@ -138,6 +138,8 @@ func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 				if err != nil {
 					logger.Println("Validating .desktop file failed!", err)
 					time.Sleep(5 * time.Second)
+				} else {
+					actionData.desktopFile = path
 				}
 				file.Close()
 			case "--dbus-arguments":
