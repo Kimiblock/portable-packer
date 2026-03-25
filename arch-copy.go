@@ -34,12 +34,12 @@ func archCopy(act action, logger *log.Logger) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		sp := strings.Split(line, " ")
+		sp := strings.SplitN(line, " ", 2)
 		if len(sp) < 2 {
 			logger.Println("Invalid output: column mismatch")
 			continue
 		}
-		pathList = append(pathList, strings.Join(sp[1:], ""))
+		pathList = append(pathList, sp[1])
 	}
 	logger.Println("Successfully obtained path list")
 
