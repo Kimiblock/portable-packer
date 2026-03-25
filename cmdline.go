@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -85,7 +86,10 @@ func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 					line := scanner.Text()
 					id, hasPrefix := strings.CutPrefix(line, "appID=")
 					if hasPrefix {
-						actionData.appID = id
+						actionData.appID, err = strconv.Unquote(id)
+						if err != nil {
+							actionData.appID = id
+						}
 						break
 					}
 				}
