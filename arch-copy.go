@@ -54,7 +54,14 @@ func archCopy(act action, logger *log.Logger) {
 				return
 			}
 			if stat.Mode()&os.ModeSymlink != 0 {
-				log.Println("Processing symlink", stat.Name())
+				dest, err := os.Readlink(path)
+				if err != nil {
+					log.Fatalln("Could not read link destination:", err)
+				}
+				log.Println("Processing symlink", stat.Name(), dest)
+				err = os.Symlink(dest, filepath.Join(pkgdir, path))
+				return
+
 			}
 			err = os.MkdirAll(filepath.Dir(filepath.Join(pkgdir, path)), 0755)
 			if err != nil {
