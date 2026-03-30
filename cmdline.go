@@ -4,11 +4,9 @@ import (
 	"bufio"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/BurntSushi/toml"
 )
