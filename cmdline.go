@@ -135,14 +135,6 @@ func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 				if err != nil {
 					logger.Fatalln("Could not open .desktop file:", err)
 				}
-				cmd := exec.Command("desktop-file-validate", path)
-				cmd.Stderr = os.Stderr
-				cmd.Stdout = os.Stdout
-				err = cmd.Run()
-				if err != nil {
-					logger.Println("Validating .desktop file failed!", err)
-					time.Sleep(10 * time.Second)
-				}
 				actionData.desktopFile = path
 				file.Close()
 			case "--dbus-arguments":
