@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -99,6 +100,39 @@ func archPost (logger *log.Logger, act action) {
 		}
 		ori.Close()
 		dest.Close()
+		cmd := exec.Command(
+			"desktop-file-validate",
+			filepath.Join(pkgdir, "usr/share/applications/", act.appID + ".desktop"),
+		)
+		cmd.Stderr = os.Stderr
+		err = cmd.Run()
+		if err != nil {
+			logger.Fatalln("Validation of desktop file failed!")
+		}
+		if ! act.busActivate {
+			cmdline := []string{
+				"--remove-key=DBusActivatable",
+				filepath.Join(pkgdir, "usr/share/applications/", act.appID + ".desktop"),
+			}
+			cmd := exec.Command("desktop-file-edit", cmdline...)
+			cmd.Stderr = os.Stderr
+			err := cmd.Run()
+			if err != nil {
+				logger.Fatalln("Could not set DBusActivatable key:", err)
+			}
+		} else {
+			cmdline := []string{
+				"--set-key=DBusActivatable",
+				"--set-value=true",
+				filepath.Join(pkgdir, "usr/share/applications/", act.appID + ".desktop"),
+			}
+			cmd := exec.Command("desktop-file-edit", cmdline...)
+			cmd.Stderr = os.Stderr
+			err := cmd.Run()
+			if err != nil {
+				logger.Fatalln("Could not set DBusActivatable key:", err)
+			}
+		}
 	}
 
 	if len(act.configPath) > 0 {
