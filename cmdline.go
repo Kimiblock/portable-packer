@@ -141,10 +141,9 @@ func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 				err = cmd.Run()
 				if err != nil {
 					logger.Println("Validating .desktop file failed!", err)
-					time.Sleep(5 * time.Second)
-				} else {
-					actionData.desktopFile = path
+					time.Sleep(10 * time.Second)
 				}
+				actionData.desktopFile = path
 				file.Close()
 			case "--dbus-arguments":
 				if len(cmdline) <= idx + 1 {
