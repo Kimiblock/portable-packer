@@ -30,5 +30,7 @@ func instDBusService(logger *log.Logger, act action, prefixPath string) {
 	_, err = io.Copy(file, reader)
 	if err != nil {
 		logger.Fatalln("Could not write D-Bus service:", err)
+	} else {
+		logger.Println("Successfully installed D-Bus service:", path)
 	}
 }
