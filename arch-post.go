@@ -165,6 +165,6 @@ func archPost (logger *log.Logger, act action) {
 		}
 	}
 	if act.busActivate {
-		instDBusService(logger, act, pkgname)
+		instDBusService(logger, act, pkgdir)
 	}
 }
