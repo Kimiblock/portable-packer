@@ -15,7 +15,7 @@ func instDBusService(logger *log.Logger, act action, prefixPath string) {
 	builder := strings.Builder{}
 	builder.WriteString("[D-BUS Service]\n")
 	builder.WriteString("Name=" + act.appID + "\n")
-	builder.WriteString("Exec=/usr/bin/env _portableConfig=" + act.appID + " portable --dbus-activation\n")
+	builder.WriteString("Exec=/usr/bin/env PORTABLE_CONF=" + act.appID + " portable --dbus-activation\n")
 	path := filepath.Join(prefixPath, "usr/share/dbus-1/services", act.appID + ".service")
 	err := os.MkdirAll(filepath.Dir(path), 0755)
 	if err != nil {
