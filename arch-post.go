@@ -53,7 +53,7 @@ func archPost (logger *log.Logger, act action) {
 	}
 
 	builder.WriteString(act.appID)
-	builder.WriteString("\nexec portable -- $@\n")
+	builder.WriteString("\nexec portable --file-forwarding -- $@\n")
 	reader := strings.NewReader(builder.String())
 	err := os.MkdirAll(filepath.Join(pkgdir, "/usr/bin"), 0755)
 	if err != nil {
