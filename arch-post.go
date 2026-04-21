@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -105,9 +107,19 @@ func archPost (logger *log.Logger, act action) {
 			filepath.Join(pkgdir, "usr/share/applications/", act.appID + ".desktop"),
 		)
 		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
 		err = cmd.Run()
 		if err != nil {
-			logger.Fatalln("Validation of desktop file failed!")
+			file, err := os.Open(filepath.Join(pkgdir, "usr/share/applications/", act.appID + ".desktop"))
+			if err != nil {
+				logger.Fatalln("Could not open .desktop file:", err)
+			}
+			defer file.Close()
+			scanner := bufio.NewScanner(file)
+			for scanner.Scan() {
+				fmt.Fprintln(os.Stdout, scanner.Text())
+			}
+			logger.Fatalln("Validation of desktop file failed!", err)
 		}
 		if ! act.busActivate {
 			cmdline := []string{
