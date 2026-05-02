@@ -20,9 +20,35 @@ func archPost (logger *log.Logger, act action) {
 	if len(srcdir) == 0 || len(pkgdir) == 0 || len(pkgname) == 0 {
 		logger.Fatalln("Please declare srcdir, pkgdir, pkgname as global")
 	}
+	wg.Go(func() {
+		if act.binOverlay {
+			err := copyDir(
+				path(filepath.Join(
+					pkgdir,
+					"/usr/lib/portable/info",
+					act.appID,
+					"bin",
+				)),
+				path(filepath.Join(
+					pkgdir,
+					"/usr/bin",
+				)),
+			)
+			if err != nil {
+				logger.Fatalln("Could not copy binaries to overlay:", err)
+			}
+		}
+
+		err := os.RemoveAll(filepath.Join(pkgdir, "/usr/bin"))
+		if err != nil {
+			if os.IsNotExist(err) {
+				return
+			}
+			logger.Fatalln("Could not remove /usr/bin in package root:", err)
+		}
+	})
 	pathList := []string{
 		"/usr/share/applications",
-		"/usr/bin",
 		"/etc/xdg/autostart",
 		"/usr/share/dbus-1",
 		"/usr/share/menu",
