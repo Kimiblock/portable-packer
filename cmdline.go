@@ -23,6 +23,7 @@ type action struct {
 	desktopFile	string
 	busActivate	bool
 	busArgs		[]string
+	binOverlay	bool
 }
 
 func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
@@ -120,6 +121,7 @@ func cmdlineDispatcher (cmdline []string, logger *log.Logger) {
 					log.Println("Undecoded keys:", md.Undecoded())
 				}
 				actionData.appID = conf.Metadata.AppID
+				actionData.binOverlay = conf.Exec.Overlay
 			case "--desktop-file":
 				if len(cmdline) <= idx + 1 {
 					logger.Fatalln("Could not decode command line arguments: not enough arguments")
