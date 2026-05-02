@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -10,7 +11,7 @@ import (
 
 type path string
 
-func copyDir(dst path, src path) error {
+func copyDir(dst path, src path, logger *log.Logger) error {
 	var wg sync.WaitGroup
 	var errChan = make(chan error, 512)
 	defer func () {
@@ -65,6 +66,13 @@ func copyDir(dst path, src path) error {
 			if err != nil {
 				errChan <- err
 			}
+			logger.Println("Copied",
+				filepath.Join(string(src), entry.Name()),
+				"to",
+				filepath.Join(
+					string(dst),
+					entry.Name(),
+				))
 		})
 	}
 	wg.Wait()

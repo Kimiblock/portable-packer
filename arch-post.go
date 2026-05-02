@@ -37,6 +37,7 @@ func archPost (logger *log.Logger, act action) {
 			if err != nil {
 				logger.Fatalln("Could not copy binaries to overlay:", err)
 			}
+			logger.Println("Finished copying /usr/bin")
 		}
 
 		err := os.RemoveAll(filepath.Join(pkgdir, "/usr/bin"))
