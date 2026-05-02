@@ -14,9 +14,6 @@ type path string
 func copyDir(dst path, src path, logger *log.Logger) error {
 	var wg sync.WaitGroup
 	var errChan = make(chan error, 512)
-	defer func () {
-		close(errChan)
-	} ()
 	wg.Go(func() {
 		err := os.MkdirAll(string(dst), 0755)
 		if err != nil {
@@ -76,6 +73,7 @@ func copyDir(dst path, src path, logger *log.Logger) error {
 		})
 	}
 	wg.Wait()
+	close(errChan)
 	for sig := range errChan {
 		if sig != nil {
 			return sig
