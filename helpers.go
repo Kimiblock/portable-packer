@@ -30,7 +30,13 @@ func copyDir(dst path, src path) error {
 	for _, ent := range entries {
 		entry := ent
 		wg.Go(func() {
-			if entry.IsDir() {
+			info, err := entry.Info()
+			if err != nil {
+				errChan <- err
+				return
+			}
+			mode := info.Mode().Perm()
+			if info.IsDir() {
 				errChan <- errors.New("Packer does not support recursive directory")
 				return
 			}
@@ -48,7 +54,7 @@ func copyDir(dst path, src path) error {
 					entry.Name(),
 				),
 				os.O_TRUNC|os.O_CREATE|os.O_WRONLY,
-				0755,
+				mode,
 			)
 			if err != nil {
 				errChan <- err
