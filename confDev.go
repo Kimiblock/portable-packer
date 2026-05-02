@@ -21,6 +21,7 @@ type Metadata struct {
 type Exec struct {
 	Target		string
 	Arguments	[]string
+	Overlay		bool
 }
 
 type BusLaunch struct {
@@ -31,11 +32,12 @@ type BusLaunch struct {
 
 type ProcMgmt struct {
 	Track		bool
+	Background	bool
 }
 
 type SysMgmt struct {
 	InhibitSuspend	bool
-	GlobalShortcuts	bool
+	InhibitOnBehalf	bool
 	GameMode	bool
 }
 
@@ -60,5 +62,6 @@ type AdvancedOpts struct {
 	TrayWake		bool
 	KDEStatus		bool
 	FlatpakInfo		bool
+	Landlock		bool
 }
 
