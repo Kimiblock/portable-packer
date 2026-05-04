@@ -57,11 +57,12 @@ func archPost (logger *log.Logger, act action) {
 		"/usr/share/gnome-shell",
 	}
 	for _, path := range pathList {
+		pth := path
 		wg.Go(func() {
 			err := os.RemoveAll(
 				filepath.Join(
 					pkgdir,
-					path,
+					pth,
 				),
 			)
 			if err != nil {
@@ -128,8 +129,15 @@ func archPost (logger *log.Logger, act action) {
 		if err != nil {
 			logger.Fatalln("Could not install .desktop file:", err)
 		}
-		ori.Close()
-		dest.Close()
+		defer ori.Close()
+		err = dest.Sync()
+		if err != nil {
+			logger.Fatalln("Could not install .desktop file:", err)
+		}
+		err = dest.Close()
+		if err != nil {
+			logger.Fatalln("Could not install .desktop file:", err)
+		}
 		cmd := exec.Command(
 			"desktop-file-validate",
 			filepath.Join(pkgdir, "usr/share/applications/", act.appID + ".desktop"),
