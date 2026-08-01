@@ -34,6 +34,26 @@ func copyDir(dst path, src path, logger *log.Logger) error {
 				return
 			}
 			mode := info.Mode().Perm()
+
+			// Handle symlinks correctly
+			if info.Mode()&os.ModeSymlink != 0 {
+				dest, err := os.Readlink(
+					filepath.Join(
+						string(dst),
+						entry.Name(),
+					),
+				)
+				if err != nil {
+					log.Fatalln("Could not read link destination:", err)
+				}
+				log.Println("Processing symlink", entry.Name(), dest)
+				err = os.Symlink(
+					dest,
+					filepath.Join(string(src), entry.Name()),
+				)
+				return
+			}
+
 			if info.IsDir() {
 				errChan <- errors.New("Packer does not support recursive directory")
 				return
