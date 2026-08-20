@@ -22,7 +22,19 @@ func archPost (logger *log.Logger, act action) {
 	}
 	wg.Go(func() {
 		if act.binOverlay {
-			err := copyDir(
+			err := os.MkdirAll(
+				filepath.Join(
+					pkgdir,
+					"/usr/bin",
+				),
+				0755,
+			)
+
+			if err != nil {
+				logger.Fatalln("Could not create binary overlay:", err)
+			}
+
+			err = copyDir(
 				path(filepath.Join(
 					pkgdir,
 					"/usr/lib/portable/info",
