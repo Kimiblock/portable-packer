@@ -25,7 +25,9 @@ func archPost (logger *log.Logger, act action) {
 			err := os.MkdirAll(
 				filepath.Join(
 					pkgdir,
-					"/usr/bin",
+					"/usr/lib/portable/info",
+					act.appID,
+					"bin",
 				),
 				0755,
 			)
