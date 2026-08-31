@@ -4,3 +4,17 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+
+[features]
+default	= ["archlinux"]
+
+# Meta feature flag for package list extraction
+package-extract = []
+
+# Meta feature flag for post processing
+post-process = []
+
+archlinux = ["package-extract", "post-process"]
+
+[profile.release]
+lto = true
