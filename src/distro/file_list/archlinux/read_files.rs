@@ -1,4 +1,36 @@
+/**
+	Gets a list of PathBuf from pacman database, assumes dbroot as default
+*/
+pub async fn get(pkgname: &str) -> Result<Vec<std::path::PathBuf>, super::ArchError> {
+	let package_root = match_pkg_database(&pkgname).await?;
 
+	let files_path = {
+		let mut path = package_root.to_path_buf();
+		path.push("desc");
+		path
+	};
+
+	let mut file = tokio::fs::OpenOptions::new()
+		.read(true)
+		.write(false)
+		.open(files_path)
+		.await
+		.map_err(super::ArchError::DbFilesIOError)
+		?;
+
+
+
+	let content = {
+		let mut buf = String::new();
+		use tokio::io::AsyncReadExt;
+		file
+			.read_to_string(&mut buf)
+			.await
+			.map_err(super::ArchError::DbFilesIOError)
+			?;
+		buf
+	};
+}
 
 
 /// Find the path for pacman database
