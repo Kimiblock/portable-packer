@@ -19,3 +19,6 @@
 ```
 
 # Architecture
+
+- Main package: higher level task-dispatches, control flow integration
+	- file_list: Defines
