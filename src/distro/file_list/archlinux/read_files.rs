@@ -30,6 +30,22 @@ pub async fn get(pkgname: &str) -> Result<Vec<std::path::PathBuf>, super::ArchEr
 			?;
 		buf
 	};
+
+	let mut paths = vec![];
+
+	{
+		for line in content.split("\n") {
+			let line = line.trim();
+
+			if line.is_empty() {
+				continue;
+			};
+
+			paths.push(
+				std::path::PathBuf::from(line)
+			);
+		}
+	};
 }
 
 
