@@ -21,4 +21,6 @@
 # Architecture
 
 - Main package: higher level task-dispatches, control flow integration
-	- file_list: Defines
+	- `distro` module: holds multiple distro-specific modules
+		- `file_list` module: Defines the public PackageFile enum, and implement various functions around those types for package copying.
+			- Multiple distro-specific modules implementing public trait `GetFileList` to obtain a vector of file list.
