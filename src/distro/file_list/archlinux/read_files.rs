@@ -46,6 +46,8 @@ pub async fn get(pkgname: &str) -> Result<Vec<std::path::PathBuf>, super::ArchEr
 			);
 		}
 	};
+
+	Ok(paths)
 }
 
 
