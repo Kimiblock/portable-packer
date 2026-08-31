@@ -1,8 +1,13 @@
+#[cfg(feature = "archlinux")]
+pub mod archlinux;
+
 /**
 	The public trait GetFileList is implemented by multiple backends
 */
 pub trait GetFileList {
-	async fn list(&self) -> Vec<PackageFile>;
+	async fn list(&self) -> Result<Vec<PackageFile>, Self::ListError>;
+
+	type ListError;
 }
 
 /**
