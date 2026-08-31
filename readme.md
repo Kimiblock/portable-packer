@@ -17,3 +17,5 @@
 [Packer] 	--desktop-file [path]	-> Specify the desktop file path for sandbox
 [Packer] 	--dbus-activation	-> Enables the activation from D-Bus (optional)
 ```
+
+# Architecture
