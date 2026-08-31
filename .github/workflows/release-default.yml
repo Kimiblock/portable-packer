@@ -21,4 +21,4 @@ jobs:
     - name: Build
       run: |
         cargo fetch --locked --target host-tuple
-        cargo build --frozen
+        cargo build --frozen --release
