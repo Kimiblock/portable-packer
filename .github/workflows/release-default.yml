@@ -1,4 +1,4 @@
-name: Build debug profile with default features
+name: Build release profile with default features
 
 on:
   release:
