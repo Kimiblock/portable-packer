@@ -46,3 +46,31 @@ pub enum PackageFile {
 		link_target:	std::path::PathBuf,
 	}
 }
+
+impl PackageFile {
+	/**
+		Install the file or symbolic link into the package directory
+	*/
+	pub async fn copy(self) -> Result<(), std::io::Error> {
+		match self {
+			Self::Regular { source_path, dest_path }	=> {
+				tokio::fs::copy(
+					source_path,
+					dest_path,
+				)
+					.await
+					?;
+				Ok(())
+			}
+			Self::Symlink { dest_path, link_target }	=> {
+				tokio::fs::symlink(
+					link_target,
+					dest_path,
+				)
+					.await
+					?;
+				Ok(())
+			}
+		}
+	}
+}
