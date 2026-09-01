@@ -24,3 +24,4 @@
 	- `distro` module: holds multiple distro-specific modules
 		- `file_list` module: Defines the public PackageFile enum, and implement various functions around those types for package copying.
 			- Multiple distro-specific modules implementing public trait `GetFileList` to obtain a vector of file list.
+		- `post_install` module: Implements the post_install procedure. Post install includes cleanups (removing D-Bus services, etc.), and file installing (desktop file, D-Bus services etc.). Distro specific modules returns the package root variable.
