@@ -1,6 +1,8 @@
 #[cfg(feature = "archlinux")]
 pub mod archlinux;
 
+pub mod symlink_parse;
+
 /**
 	The public trait GetFileList is implemented by multiple backends
 */

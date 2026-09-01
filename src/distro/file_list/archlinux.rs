@@ -1,6 +1,7 @@
 mod read_files;
 
-mod test;
+#[cfg(test)]
+pub mod test;
 
 /**
 	Implements the GetFileList trait
