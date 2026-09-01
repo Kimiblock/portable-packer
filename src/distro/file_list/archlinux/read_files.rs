@@ -98,6 +98,7 @@ async fn match_pkg_database(pkgname: &str) -> Result<std::path::PathBuf, super::
 		let mut desc = {
 			let mut desc = std::path::PathBuf::from(&db_prefix);
 			desc.push(&name);
+			desc.push("desc");
 
 			tokio::fs::OpenOptions::new()
 				.read(true)
