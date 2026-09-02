@@ -19,6 +19,17 @@ pub trait PostInstall {
 		desktop_file:	std::path::PathBuf,
 	) -> Result<(), Self::PostError>;
 
+	/**
+		Removes any D-Bus service installed in package root.
+
+		Generates a new one and installs them if enabled.
+	*/
+	async fn dbus_service(
+		&self,
+		app_id:		&str,
+		generate:	bool,
+	) -> Result<(), Self::PostError>;
+
 	type PostError;
 }
 
