@@ -9,7 +9,7 @@ pub trait PostInstall {
 	async fn binary(&self, overlay: bool) -> Result<String, Self::PostError>;
 
 	/**
-		Removes any .desktop file that is installed in the package root.
+		Removes any .desktop file that is installed in the package root and autostart.
 
 		Installs the new one into package root.
 	*/
@@ -39,6 +39,11 @@ pub trait PostInstall {
 		&self,
 		app_id:		&str,
 	) -> Result<(), Self::PostError>;
+
+	/**
+		Removes any menu entry in the package root.
+	*/
+	async fn menu(&self) -> Result<(), Self::PostError>;
 
 	type PostError;
 }
