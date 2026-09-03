@@ -1,0 +1,24 @@
+name: Build debug profile with default features
+
+on:
+  release:
+    types: released
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up Rust
+      run: sudo apt-get install cargo -y
+
+    - name: Initialise submodules
+      run: git submodule update --init --recursive
+
+    - name: Build
+      run: |
+        cargo fetch --locked --target host-tuple
+        cargo build --frozen
