@@ -2,19 +2,65 @@
 	This struct implements post install function for Arch Linux
 */
 pub struct ArchPost {
-	pkgdir:	std::sync::Arc<std::path::PathBuf>,
+	pkgdir:		std::sync::Arc<std::path::PathBuf>,
+	pkgname:	std::sync::Arc<String>,
 }
 
 impl Default for ArchPost {
 	fn default() -> Self {
 		let pkgdir = std::env::var("pkgdir").expect("Could not get pkgdir from env");
+		let pkgname = std::env::var("pkgname")
+			.expect("Could not get pkgname from env");
 
 		Self {
 			pkgdir:	std::sync::Arc::new(
 				std::path::PathBuf::from(pkgdir)
 			),
+			pkgname: std::sync::Arc::new(
+				pkgname.into()
+			)
 		}
 	}
+}
+
+impl super::traits::PostInstall for ArchPost {
+	async fn binary(&self, app_id: std::sync::Arc<String>, overlay: bool) -> Result<String, Self::PostError> {
+		binary(self.pkgdir.to_path_buf(), self.pkgname.clone(), app_id.clone(), overlay).await
+	}
+	async fn gnome_shell(
+			&self,
+		) -> Result<(), Self::PostError>
+	{
+		gnome_shell(
+			self.pkgdir.to_path_buf(),
+		).await
+	}
+	async fn desktop_file(
+			&self,
+			app_id:		std::sync::Arc<String>,
+			desktop_path:	std::path::PathBuf,
+		) -> Result<(), Self::PostError>
+	{
+		desktop_file(
+			self.pkgdir.to_path_buf(),
+			app_id,
+			desktop_path,
+		).await
+	}
+	async fn dbus_service(
+			&self,
+			app_id:		std::sync::Arc<String>,
+			generate:	bool,
+		) -> Result<(), Self::PostError>
+	{
+		dbus_service(
+			self.pkgdir.to_path_buf(),
+			app_id,
+			generate,
+		).await
+	}
+
+	type PostError = ArchError;
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -46,10 +92,10 @@ pub enum ArchError {
 
 async fn binary(
 	pkgdir:		std::path::PathBuf,
-	pkgname:	&str,
-	app_id:		&str,
+	pkgname:	std::sync::Arc<String>,
+	app_id:		std::sync::Arc<String>,
 	overlay:	bool,
-) -> Result<(), ArchError> {
+) -> Result<String, ArchError> {
 	let binary_path = {
 		let mut path = pkgdir.to_path_buf();
 		path.push("usr");
@@ -63,7 +109,7 @@ async fn binary(
 		path.push("lib");
 		path.push("portable");
 		path.push("info");
-		path.push(app_id);
+		path.push(app_id.as_str());
 		path.push("bin");
 		path
 	};
@@ -106,7 +152,7 @@ async fn binary(
 		content.push_str("\n");
 
 		content.push_str("export PORTABLE_CONF=");
-		content.push_str(app_id);
+		content.push_str(app_id.as_str());
 		content.push_str("\n");
 
 		content.push_str("exec portable --file-forwarding -- $@");
@@ -115,7 +161,7 @@ async fn binary(
 
 	let binary_path = {
 		let mut path = binary_path;
-		path.push(pkgname);
+		path.push(pkgname.as_str());
 		path
 	};
 
@@ -137,12 +183,12 @@ async fn binary(
 		.map_err(ArchError::BinaryInstallIOError)
 		?;
 
-	Ok(())
+	Ok(pkgname.to_string())
 }
 
 async fn desktop_file(
 	pkgdir:		std::path::PathBuf,
-	app_id:		&str,
+	app_id:		std::sync::Arc<String>,
 	desktop_file:	std::path::PathBuf,
 ) -> Result<(), ArchError> {
 	let desktop_path = {
@@ -169,7 +215,7 @@ async fn desktop_file(
 		desktop_file,
 		{
 			let mut path = desktop_path.to_path_buf();
-			let mut name = String::from(app_id);
+			let mut name = String::from(app_id.as_str());
 			name.push_str(".desktop");
 			path.push(&name);
 			path
@@ -183,8 +229,8 @@ async fn desktop_file(
 }
 
 async fn dbus_service(
-	pkgdir:		&std::path::PathBuf,
-	app_id:		&str,
+	pkgdir:		std::path::PathBuf,
+	app_id:		std::sync::Arc<String>,
 	generate:	bool,
 ) -> Result<(), ArchError> {
 	let dbus_service_path = {
@@ -235,7 +281,7 @@ async fn dbus_service(
 		let mut path = dbus_service_path.to_path_buf();
 
 		let basename = {
-			let mut name = String::from(app_id);
+			let mut name = String::from(app_id.as_str());
 			name.push_str(".service");
 			name
 		};
@@ -264,7 +310,7 @@ async fn dbus_service(
 }
 
 async fn gnome_shell(
-	pkgdir:		&std::path::PathBuf,
+	pkgdir:		std::path::PathBuf,
 ) -> Result<(), ArchError> {
 	let shell_path = {
 		let shared_path: std::path::PathBuf = [

@@ -6,7 +6,7 @@ pub trait PostInstall {
 
 		The resulting String would be that binary name.
 	*/
-	async fn binary(&self, overlay: bool) -> Result<String, Self::PostError>;
+	async fn binary(&self, app_id: std::sync::Arc<String>, overlay: bool) -> Result<String, Self::PostError>;
 
 	/**
 		Removes any .desktop file that is installed in the package root and autostart.
@@ -15,7 +15,7 @@ pub trait PostInstall {
 	*/
 	async fn desktop_file(
 		&self,
-		app_id:		&str,
+		app_id:		std::sync::Arc<String>,
 		desktop_file:	std::path::PathBuf,
 	) -> Result<(), Self::PostError>;
 
@@ -26,7 +26,7 @@ pub trait PostInstall {
 	*/
 	async fn dbus_service(
 		&self,
-		app_id:		&str,
+		app_id:		std::sync::Arc<String>,
 		generate:	bool,
 	) -> Result<(), Self::PostError>;
 
