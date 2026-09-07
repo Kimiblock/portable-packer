@@ -39,10 +39,6 @@ pub trait PostInstall {
 		&self,
 	) -> Result<(), Self::PostError>;
 
-	/**
-		Removes any menu entry in the package root.
-	*/
-	async fn menu(&self) -> Result<(), Self::PostError>;
 
 	type PostError;
 }

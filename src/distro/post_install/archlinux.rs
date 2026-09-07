@@ -17,7 +17,6 @@ impl Default for ArchPost {
 	}
 }
 
-
 #[derive(thiserror::Error, Debug)]
 pub enum ArchError {
 	#[error("I/O error removing .desktop files: {0:#?}")]
