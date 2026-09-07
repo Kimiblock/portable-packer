@@ -34,6 +34,12 @@ pub enum ArchError {
 
 	#[error("I/O error creating stub binaries")]
 	BinaryInstallIOError(std::io::Error),
+
+	#[error("I/O error removing D-Bus services")]
+	BusRmIOError(std::io::Error),
+
+	#[error("I/O error installing D-Bus services")]
+	BusInstallIOError(std::io::Error),
 }
 
 async fn binary(
@@ -171,5 +177,86 @@ async fn desktop_file(
 		.map_err(ArchError::DesktopFileInstallIOError)
 		?;
 
+	Ok(())
+}
+
+async fn dbus_service(
+	pkgdir:		&std::path::PathBuf,
+	app_id:		&str,
+	generate:	bool,
+) -> Result<(), ArchError> {
+	let dbus_service_path = {
+		let dbus_path: std::path::PathBuf = [
+			"usr",
+			"share",
+			"dbus-1",
+			"services",
+		]
+			.iter()
+			.collect();
+		pkgdir.join(dbus_path)
+	};
+
+	if tokio::fs::try_exists(&dbus_service_path).await.map_err(ArchError::BusRmIOError)? {
+		tokio::fs::remove_dir_all(&dbus_service_path)
+			.await
+			.map_err(ArchError::BusRmIOError)
+			?;
+	};
+
+	if ! generate {
+		return Ok(());
+	};
+
+	tokio::fs::create_dir_all(&dbus_service_path)
+		.await
+		.map_err(ArchError::BusInstallIOError)
+		?;
+
+	let service_content = {
+		let mut content = String::new();
+		content.push_str("[D-BUS Service]");
+		content.push_str("\n");
+		content.push_str("Name=");
+		content.push_str(&app_id);
+		content.push_str("\n");
+
+		content.push_str("Exec=/usr/bin/env PORTABLE_CONF=");
+		content.push_str(&app_id);
+		content.push_str(" portable --dbus-activation");
+
+		content.push_str("\n");
+		content
+	};
+
+	let file_path = {
+		let mut path = dbus_service_path.to_path_buf();
+
+		let basename = {
+			let mut name = String::from(app_id);
+			name.push_str(".service");
+			name
+		};
+
+		path.push(&basename);
+		path
+	};
+
+	let mut file = tokio::fs::OpenOptions::new()
+		.read(false)
+		.write(true)
+		.create_new(true)
+		.open(file_path)
+		.await
+		.map_err(ArchError::BusInstallIOError)
+		?;
+
+	use tokio::io::AsyncWriteExt;
+
+	file
+		.write(service_content.as_bytes())
+		.await
+		.map_err(ArchError::BusInstallIOError)
+		?;
 	Ok(())
 }
