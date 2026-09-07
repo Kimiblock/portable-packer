@@ -40,6 +40,9 @@ pub enum ArchError {
 
 	#[error("I/O error installing D-Bus services")]
 	BusInstallIOError(std::io::Error),
+
+	#[error("I/O error cleaning GNOME Shell paths")]
+	GNOMEShellIOError(std::io::Error),
 }
 
 async fn binary(
@@ -260,3 +263,31 @@ async fn dbus_service(
 		?;
 	Ok(())
 }
+
+async fn gnome_shell(
+	pkgdir:		&std::path::PathBuf,
+) -> Result<(), ArchError> {
+	let shell_path = {
+		let shared_path: std::path::PathBuf = [
+			"usr",
+			"share",
+			"gnome-shell",
+		].iter().collect();
+
+		pkgdir.join(shared_path)
+	};
+
+	if tokio::fs::try_exists(&shell_path)
+		.await
+		.map_err(ArchError::GNOMEShellIOError)
+		?
+	{
+		tokio::fs::remove_dir_all(&shell_path)
+			.await
+			.map_err(ArchError::GNOMEShellIOError)
+			?;
+	};
+
+	Ok(())
+}
+

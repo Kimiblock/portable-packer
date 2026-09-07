@@ -33,11 +33,10 @@ pub trait PostInstall {
 	/**
 		Removes any GNOME Shell Extensions, Modes installed in the system.
 
-		Search Provider is preserved, with sandbox_id.ini being the name.
+		Search Provider is not preserved, with sandbox_id.ini being the name.
 	*/
 	async fn gnome_shell(
 		&self,
-		app_id:		&str,
 	) -> Result<(), Self::PostError>;
 
 	/**
