@@ -1,0 +1,3 @@
+[submodule "src/pref/legacy_config"]
+	path = src/pref/legacy_config
+	url = https://github.com/Kimiblock/portable-legacyconf.git
