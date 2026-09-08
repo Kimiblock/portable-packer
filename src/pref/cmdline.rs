@@ -42,7 +42,11 @@ pub async fn get_pref() -> super::OperationMode {
 				)
 
 			}
-			"--config-ng"		=> {}
+			"--config-ng"		=> {
+				let path: std::path::PathBuf = args.next().expect("Expected path after --config-ng").into();
+
+				config = Some(super::config_toml::get(&path).await)
+			}
 			"--desktop-file"	=> {}
 		}
 	};
