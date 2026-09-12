@@ -1,2 +1,2 @@
-mod distro;
-mod pref;
+pub mod distro;
+pub mod pref;

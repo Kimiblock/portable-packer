@@ -3,6 +3,7 @@ pub mod config;
 pub mod config_toml;
 pub mod config_legacy;
 
+#[derive(Debug)]
 pub enum OperationMode {
 	Help,
 	CopyArch{
@@ -17,6 +18,7 @@ pub enum OperationMode {
 	The public struct RuntimeOptions describes both decoded configuration and options parsed from
 		command line arguments
 */
+#[derive(Debug)]
 pub struct RuntimeOptions {
 	/**
 		The sandbox_id is the equivalent of config's sandbox_id
