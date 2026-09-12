@@ -1,7 +1,16 @@
+pub mod cmdline;
+pub mod config;
+pub mod config_toml;
+pub mod config_legacy;
+
 pub enum OperationMode {
 	Help,
-	Copy(RuntimeOptions),
-	PostOnly(RuntimeOptions),
+	CopyArch{
+		options:	RuntimeOptions,
+	},
+	PostOnlyArch{
+		options:	RuntimeOptions,
+	},
 }
 
 /**
@@ -14,5 +23,10 @@ pub struct RuntimeOptions {
 
 		It represents a unique, fixed identity of a sandbox.
 	*/
-	pub sandbox_id:	String,
+	pub config:		crate::pref::config::Config,
+
+	/**
+		The path for supplied .desktop file (currently single)
+	*/
+	pub desktop_file:	std::path::PathBuf,
 }

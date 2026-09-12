@@ -4,6 +4,10 @@ enum OpMode {
 	Post,
 }
 
+enum Distro {
+	Arch,
+}
+
 /**
 	Get the user preference and possibly configuration data from cmdline
 */
@@ -16,9 +20,18 @@ pub async fn get_pref() -> super::OperationMode {
 
 	let mut mode: Option<OpMode>;
 	let mut config: Option<super::config::Config>;
+	let mut distro: Option<Distro>;
+	let mut desktop_path: Option<std::path::PathBuf>;
 
 	while let Some(arg) = args.skip(1).next() {
 		match arg.as_str() {
+			"--distro"		=> {
+				match args.next().expect("Expected a distribution codename").as_str() {
+					"arch" | "archlinux"	=> {
+						distro = Some(Distro::Arch)
+					}
+				}
+			}
 			"--mode"		=> {
 				match args.next().expect("Expected argument after --mode").as_str() {
 					"copy"	=> {
@@ -47,8 +60,43 @@ pub async fn get_pref() -> super::OperationMode {
 
 				config = Some(super::config_toml::get(&path).await)
 			}
-			"--desktop-file"	=> {}
+			"--desktop-file"	=> {
+				desktop_path = Some(
+					args.next().expect("Expected path after").into()
+				)
+			}
 		}
 	};
+
+	let runtime_options = super::RuntimeOptions {
+		config:		{
+			config.expect("Expected a configuration")
+		},
+		desktop_file:	desktop_path.expect("Expected a desktop file"),
+	};
+
+	match mode.unwrap_or(OpMode::Help) {
+		OpMode::Help	=> {
+			super::OperationMode::Help
+		}
+		OpMode::Copy	=> {
+			match distro.expect("Expected a distribution") {
+				Distro::Arch	=> {
+					super::OperationMode::CopyArch {
+						options: runtime_options,
+					}
+				}
+			}
+		}
+		OpMode::Post	=> {
+			match distro.expect("Expected a distribution") {
+				Distro::Arch	=> {
+					super::OperationMode::PostOnlyArch {
+						options: runtime_options,
+					}
+				}
+			}
+		}
+	}
 
 }
