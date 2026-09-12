@@ -12,23 +12,27 @@ enum Distro {
 	Get the user preference and possibly configuration data from cmdline
 */
 pub async fn get_pref() -> super::OperationMode {
-	let args = std::env::args();
+	let mut args = std::env::args();
+	args.next();
 
 	if args.len() <= 1 {
 		return super::OperationMode::Help;
 	};
 
-	let mut mode: Option<OpMode>;
-	let mut config: Option<super::config::Config>;
-	let mut distro: Option<Distro>;
-	let mut desktop_path: Option<std::path::PathBuf>;
+	let mut mode: Option<OpMode> = None;
+	let mut config: Option<super::config::Config> = None;
+	let mut distro: Option<Distro> = None;
+	let mut desktop_path: Option<std::path::PathBuf> = None;
 
-	while let Some(arg) = args.skip(1).next() {
+	while let Some(arg) = args.next() {
 		match arg.as_str() {
 			"--distro"		=> {
 				match args.next().expect("Expected a distribution codename").as_str() {
 					"arch" | "archlinux"	=> {
-						distro = Some(Distro::Arch)
+						distro = Some(Distro::Arch);
+					}
+					v			=> {
+						unimplemented!("Distribution unimplemented: {v}");
 					}
 				}
 			}
@@ -64,6 +68,9 @@ pub async fn get_pref() -> super::OperationMode {
 				desktop_path = Some(
 					args.next().expect("Expected path after").into()
 				)
+			}
+			v			=> {
+				eprintln!("Unimplemented argument: {v:?}")
 			}
 		}
 	};
