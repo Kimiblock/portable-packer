@@ -252,6 +252,45 @@ async fn desktop_file(
 			?
 	};
 
+	// appd: skip registration
+	{
+		let mut file = tokio::fs::OpenOptions::new()
+			.read(true)
+			.write(true)
+			.open(&desktop_file)
+			.await
+			.map_err(ArchError::DesktopFileInstallIOError)
+			?;
+
+		use tokio::io::AsyncReadExt;
+
+		let content = {
+			let mut buffer = String::new();
+
+			file
+				.read_to_string(&mut buffer)
+				.await
+				.map_err(ArchError::DesktopFileInstallIOError)
+				?;
+
+			buffer
+		};
+
+		let mut content = content.lines();
+
+		if content.any(|x| x == "X-systemd-skip-register=true") {
+
+		} else {
+			use tokio::io::AsyncWriteExt;
+			file.write(
+				"\nX-systemd-skip-register=true\n".as_bytes()
+			)
+				.await
+				.map_err(ArchError::DesktopFileInstallIOError)
+				?;
+		}
+	};
+
 	tokio::fs::create_dir_all(&desktop_path)
 		.await
 		.map_err(ArchError::DesktopFileInstallIOError)
