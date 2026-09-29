@@ -134,6 +134,7 @@ async fn match_pkg_database(pkgname: &str) -> Result<std::path::PathBuf, super::
 
 			if line.trim() == "%NAME%" {
 				is_name = true;
+				continue;
 			};
 
 			if is_name {
@@ -141,10 +142,9 @@ async fn match_pkg_database(pkgname: &str) -> Result<std::path::PathBuf, super::
 					let mut path = db_prefix.to_path_buf();
 					path.push(&name);
 					return Ok(path);
-				} else {
-					continue;
 				};
-			}
+				break;
+			};
 		};
 	}
 }
